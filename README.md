@@ -1,6 +1,6 @@
 # Countdown template for Caspar CG
 
-
+![](casrparcgcountdown.png)
 
 ### Caspar template variables
 | Key        | Default           | Description  |
@@ -15,4 +15,6 @@
 | bar-color |   blue   |    Progression bar CSS color |
 | bar-height |   35   |    Progression bar height in px |
 | bar-position |   bottom   |    Progression bar position bottom or top |
+
+
 [My twitter](https://twitter.com/altoar)
