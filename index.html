@@ -1,83 +1,109 @@
-<!-- Display the countdown timer in an element -->
 <html>
     <body>
         <div class="frame">
             <p id="countdown"></p>
+            <div id="progressbar"></div>
         </div>
     </body>
 </html>
 
 
 <script src="jquery-3.4.1.min.js"></script>
-
 <script src="jquery.countdown.min.js"></script>
 <script src="caspar.js"></script>
 <script>
-function play(){
-    console.log('play');
-   $('body').fadeTo(600, '1.0');
+    function play(){
+        $('body').fadeTo(600, '1.0');
+    }
+    // function update(){
 
-}
-// function update(){
-//     $('#timer').text('test');
-// }
-function wipe(){
+    // }
+    function wipe(){
 
-}
-function stop(){
-    $('body').fadeTo(600, '0.0');
-}
+    }
+    function stop(){
+        $('body').fadeTo(600, '0.0');
+    }
+    function progress(timetotal) {
+        var timeleft = timetotal-2
+        
+        window.progressinterval = setInterval(function(){ 
+            var progressBarWidth = timeleft / timetotal * 100;
+            timeleft = timeleft-1
+            $('#progressbar').css('width', progressBarWidth +'%')
 
+            if(progressBarWidth<=0){
+                clearInterval(window.progressinterval);
+                $("#progressbar").css({"visibility": "hidden"});
+            }
+            
 
-function insertData(data){
-    var cd_time = 10*60000
-    if(data['countdown']) cd_time = data['countdown']
-    if(data['font-size']) $("#countdown").css( "fontSize", data['font-size']+'px' );
-    if(data['color']) $("#countdown").css( "color", data['color'] );
+        }, 1000);
+    };
 
-var userMilliseconds = (cd_time * 1000),
-    dateMilliseconds = new Date().getTime(),
-    milliseconds = dateMilliseconds + userMilliseconds,
-    yyyy = new Date(milliseconds).getFullYear(),
-    mm = new Date(milliseconds).getMonth()+1,
-    dd = new Date(milliseconds).getDate(),
-    hr = new Date(milliseconds).getHours(),
-    min = new Date(milliseconds).getMinutes(),
-    sec = new Date(milliseconds).getSeconds();
-
-if(dd<10) dd='0'+dd
-if(hr<10) hr='0'+hr
-if(mm<10)  mm='0'+mm
-if(sec<10) sec='0'+sec
-
-
-var countdown = yyyy +'-' + mm +'-' + dd +' ' + hr + ':' + min + ':' + sec ;
-
-if(cd_time > 0){
-  $("#countdown").countdown(countdown, function(event){
-    var totalHours = event.offset.totalDays * 24 + event.offset.hours;
-    if(totalHours>0){
-        if(totalHours<10){
-            totalHours='0'+totalHours+':'
-        }else{
-            totalHours=totalHours+':'
+    function insertData(data){
+        var cd_time = 60
+        var elapsed_text = ''
+        var top = 0
+        if(data['countdown']) cd_time = parseInt(data['countdown'])
+        if(data['font-size']) $("#countdown").css( "fontSize", data['font-size']+'px' );
+        if(data['color']) $("#countdown").css( "color", data['color'] );
+        if(data['elapsed_text']) elapsed_text = data['elapsed_text']
+        if(data['top']) $("#countdown").css( "top", data['top']+'px' );
+        if(data['bar-visible']=='true') $("#progressbar").css({"visibility": "visible"});
+        if(data['bar-color']) $("#progressbar").css( "background", data['bar-color'] );
+        if(data['bar-height']) $("#progressbar").css( "height", data['bar-height']+'px' );
+        if(data['bar-position']=='top') {
+            $("#progressbar").css( "top", 0 );
+            $("#progressbar").css( "bottom", 'unset' );
         }
-    }else{
-        totalHours = ''
-    }
-    
-    
-    $(this).text(event.strftime(totalHours + '%M:%S'));
+        $('#progressbar').css({"width": "100%"});
+        
+        clearInterval(window.progressinterval);
+        
+        progress(cd_time);
 
-    
-    if (event.elapsed) {
-        $(this).text('');
+        var userMilliseconds = (cd_time * 1000),
+            dateMilliseconds = new Date().getTime(),
+            milliseconds = dateMilliseconds + userMilliseconds,
+            yyyy = new Date(milliseconds).getFullYear(),
+            mm = new Date(milliseconds).getMonth()+1,
+            dd = new Date(milliseconds).getDate(),
+            hr = new Date(milliseconds).getHours(),
+            min = new Date(milliseconds).getMinutes(),
+            sec = new Date(milliseconds).getSeconds();
+
+        if(dd<10) dd='0'+dd
+        if(hr<10) hr='0'+hr
+        if(mm<10)  mm='0'+mm
+        if(sec<10) sec='0'+sec
+        var countdown = yyyy +'-' + mm +'-' + dd +' ' + hr + ':' + min + ':' + sec ;
+        if(cd_time > 0){
+            
+            $("#countdown").countdown(countdown, function(event){
+                var totalHours = event.offset.totalDays * 24 + event.offset.hours;
+                if(totalHours>0){
+                    if(totalHours<10){
+                        totalHours='0'+totalHours+':'
+                    }else{
+                        totalHours=totalHours+':'
+                    }
+                }else{
+                    totalHours = ''
+                }
+                
+                
+                $(this).text(event.strftime(totalHours + '%M:%S'));
+
+                
+                if (event.elapsed) {
+                    $(this).text(elapsed_text);
+                }
+            });
+        } else {
+            $("#countdown").css({"visibility": "hidden"});
+        }
     }
-  });
-} else {
-  $("#countdown").css({"display": "none"});
-}
-}
 
 </script>
 <style >
@@ -92,18 +118,30 @@ html, body {
 }
 body {
     opacity:0.0;
-  -webkit-transform: translateZ(0);
-  will-change: transform, opacity;
 }
 .frame {
-    width: 1920px;
-    height: 1080px;
-    text-align: center;
+    width: 100%;
+    height: 100%;
+    
+    position: relative;
 }
 #countdown {
+    position: absolute;
+    top: 0px;
     font-family: Roboto;
     color: blue;
     font-size: 40px;
+    width: 100%;
+    text-align: center;
+}
+#progressbar {
+    position: absolute;
+    bottom: 0;
+    height: 20px;
+    width: 100%;
+    background: blue;
+    transition: 1s;
+    visibility: hidden;
 }
 
 </style>

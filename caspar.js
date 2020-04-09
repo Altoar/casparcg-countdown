@@ -18,7 +18,6 @@ function escapeHtml(unsafe) {
     var data = {};  // resulting object
     for (k=0;k<node.length;k++)   {
        var idCaspar = node[k].getAttribute("id");
-       //console.log(idCaspar);
        var valCaspar = node[k].childNodes[0].getAttribute("value");
        if ( idCaspar != undefined && valCaspar != undefined){
          data[idCaspar] = valCaspar;
