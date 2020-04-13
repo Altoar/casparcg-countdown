@@ -1,10 +1,11 @@
+//Taken from https://github.com/gjverhoeff
+
 function escapeHtml(unsafe) {
     return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
  }
  var parser = null;
  // Parse templateData into an XML object
  function parseCaspar(str)   {
-   console.log(str)
     var xmlDoc;
     if (window.DOMParser)   {
        parser=new DOMParser();

@@ -13,7 +13,7 @@
 <script src="caspar.js"></script>
 <script>
     function play(){
-        $('body').fadeTo(600, '1.0');
+        $('body').fadeTo(500, '1.0');
     }
     // function update(){
 
@@ -22,10 +22,10 @@
 
     }
     function stop(){
-        $('body').fadeTo(600, '0.0');
+        $('body').fadeTo(500, '0.0');
     }
     function progress(timetotal) {
-        var timeleft = timetotal-2
+        var timeleft = timetotal
         
         window.progressinterval = setInterval(function(){ 
             var progressBarWidth = timeleft / timetotal * 100;
@@ -38,14 +38,22 @@
             }
             
 
-        }, 1000);
+        }, 100);
     };
 
     function insertData(data){
-        var cd_time = 60
+        var cd_time = 600
         var elapsed_text = ''
-        var top = 0
-        if(data['countdown']) cd_time = parseInt(data['countdown'])
+
+        if(data['countdown']) {
+            if(data['countdown'].indexOf(':') !== -1){ //format hh:mm:ss
+                var a = data['countdown'].split(':'); 
+                cd_time = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+            }else{ //input seconds only
+                cd_time = parseInt(data['countdown'])
+            }
+        }
+        if(data['end_at']) cd_time = (new Date(data['end_at']).getTime() - new Date().getTime()) / 1000;
         if(data['font-size']) $("#countdown").css( "fontSize", data['font-size']+'px' );
         if(data['color']) $("#countdown").css( "color", data['color'] );
         if(data['elapsed_text']) elapsed_text = data['elapsed_text']
@@ -61,7 +69,7 @@
         
         clearInterval(window.progressinterval);
         
-        progress(cd_time);
+        progress(cd_time*10);
 
         var userMilliseconds = (cd_time * 1000),
             dateMilliseconds = new Date().getTime(),
@@ -91,14 +99,16 @@
                 }else{
                     totalHours = ''
                 }
-                
-                
-                $(this).text(event.strftime(totalHours + '%M:%S'));
 
-                
-                if (event.elapsed) {
-                    $(this).text(elapsed_text);
-                }
+                $(this).text(event.strftime(totalHours + '%M:%S'));
+            }).on('finish.countdown', function(){
+                setInterval(function(){ 
+                    if(elapsed_text){
+                        $("#countdown").text(elapsed_text);
+                    }else{
+                        stop()
+                    }
+                }, 1000);
             });
         } else {
             $("#countdown").css({"visibility": "hidden"});
@@ -108,8 +118,8 @@
 </script>
 <style >
 @font-face {
-  font-family: Roboto;
-  src: url('Roboto/Roboto-Bold.ttf');
+  font-family: MyFont;
+  src: url('fonts/Roboto/Roboto-Bold.ttf');
 }
 html, body {
     margin: 0;
@@ -128,7 +138,7 @@ body {
 #countdown {
     position: absolute;
     top: 0px;
-    font-family: Roboto;
+    font-family: MyFont;
     color: blue;
     font-size: 40px;
     width: 100%;
@@ -140,7 +150,7 @@ body {
     height: 20px;
     width: 100%;
     background: blue;
-    transition: 1s;
+    transition: 0.3s;
     visibility: hidden;
 }
 
